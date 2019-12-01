@@ -137,30 +137,6 @@ namespace BinaryLove
 				BufferToTuple<I + 1>(_tuple, _buffer, _offset);
 		}
 
-		// Purpose: Overrides _size parameter with size of the tuple in bytes
-		template<std::size_t I = 0, class ...T>
-		void TupleToSize(const std::tuple<T...>& _tuple,
-			std::size_t& _size)
-		{
-			// Make sure we start with the size of 0
-			if constexpr (I == 0)
-				_size = 0;
-
-			_size += sizeof(std::tuple_element<I, std::tuple<T...>>::type);
-
-			if constexpr (I + 1 != std::tuple_size<std::tuple<T...>>::value)
-				TupleToSize<I + 1>(_tuple, _size);
-		}
-
-		// Purpose: Returns the size of the tuple in bytes
-		template<class ...T>
-		std::size_t GetTupleSize(const std::tuple<T...>& _tuple)
-		{
-			std::size_t bl_return = 0;
-			TupleToSize(_tuple, bl_return);
-			return bl_return;
-		}
-
 		// Purpose: Overrides _buffer with data from _tuple at a given _offset
 		template<std::size_t I = 0, class ...T>
 		void TupleToBuffer(const std::tuple<T...>& _tuple,
@@ -214,6 +190,36 @@ namespace BinaryLove
 #endif // BINARY_LOVE_EXCEPTIONS
 	}
 
+	namespace Utility
+	{
+		// Purpose: Returns the size of the tuple in bytes
+		template<class ...T>
+		std::size_t GetTupleSize(const std::tuple<T...>& _tuple)
+		{
+			std::size_t bl_return = 0;
+			Utility::details::TupleToSize(_tuple, bl_return);
+			return bl_return;
+		}
+
+		namespace details
+		{
+			// Purpose: Overrides _size parameter with size of the tuple in bytes
+			template<std::size_t I = 0, class ...T>
+			void TupleToSize(const std::tuple<T...>& _tuple,
+				std::size_t& _size)
+			{
+				// Make sure we start with the size of 0
+				if constexpr (I == 0)
+					_size = 0;
+
+				_size += sizeof(std::tuple_element<I, std::tuple<T...>>::type);
+
+				if constexpr (I + 1 != std::tuple_size<std::tuple<T...>>::value)
+					TupleToSize<I + 1>(_tuple, _size);
+			}
+		}
+	}
+
 	template<
 		class ...Types>
 		std::tuple<Types...>
@@ -224,7 +230,7 @@ namespace BinaryLove
 		std::tuple<Types...> bl_return;
 #ifdef BINARY_LOVE_EXCEPTIONS
 		// Check if our buffer is big enough to read from
-		if (details::GetTupleSize(bl_return) > _buffer.size() - _offset)
+		if (Utility::GetTupleSize(bl_return) > _buffer.size() - _offset)
 		{
 			throw details::BinaryLoveOutOfRangeException();
 			return bl_return;
@@ -253,7 +259,7 @@ namespace BinaryLove
 
 
 		std::tuple<Types...> bl_tpl;
-		for (std::size_t i = 0; i < _buffer_size / details::GetTupleSize(bl_tpl); ++i)
+		for (std::size_t i = 0; i < _buffer_size / Utility::GetTupleSize(bl_tpl); ++i)
 		{
 			details::BufferToTuple(bl_tpl, _buffer, _offset);
 			bl_return.push_back(bl_tpl);
@@ -270,7 +276,7 @@ namespace BinaryLove
 	{
 #ifdef BINARY_LOVE_EXCEPTIONS
 		// Check if our buffer is big enough to read from
-		if (details::GetTupleSize(_tuple) > _buffer.size() - _offset)
+		if (Utility::GetTupleSize(_tuple) > _buffer.size() - _offset)
 		{
 			throw details::BinaryLoveOutOfRangeException();
 			return;
@@ -285,7 +291,7 @@ namespace BinaryLove
 		WriteStream(binary_data_t& _buffer,
 			const std::vector<std::tuple<Types...>>& _tuple_buffer,
 			buffer_offset_t& _offset,
-			buffer_size_t& _buffer_size)
+			const buffer_size_t& _buffer_size)
 	{
 #ifdef BINARY_LOVE_EXCEPTIONS
 		// Check if our buffer is big enough to read from
