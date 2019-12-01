@@ -1,8 +1,8 @@
 # BinaryLove
-BinaryLove is a simple header only binary data parsing library. It accepts the data in the form of `std::vector<unsigned char>` and parses it to `std::tuple` of specified types and vice versa. Header also provides simple data loader and writer that utilise `<fstream>` header.. 
+BinaryLove is a simple header only binary data parsing library. It accepts the data in the form of `std::vector<unsigned char>` and parses it to `std::tuple` of specified types and vice versa. Header also provides simple data loader and writer that utilise `<fstream>` header.
 
 # Examples
-This section shows the propper usage of all of library's functions.
+This section shows the proper usage of all of library's functions.
 
 ## Reading and Writing files.
 ```cpp
