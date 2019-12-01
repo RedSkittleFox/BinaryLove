@@ -70,12 +70,12 @@ int main()
 
 	// We need to resize our buffer to fit all bytes
 	// GetTupleSize(std::tuple<>) returns the size of tuple in bytes
-	out_data.resize(BinaryLove::GetTupleSize(wav_header) + BinaryLove::GetTupleSize(wav_data[0]) * wav_data.size());
+	out_data.resize(BinaryLove::Utility::GetTupleSize(wav_header) + BinaryLove::Utility::GetTupleSize(wav_data[0]) * wav_data.size());
 
 	// Writes tuple to buffer
 	BinaryLove::Write(out_data, wav_header, out_offset);
 	// Writes vector of tuples to buffer
-	BinaryLove::WriteStream(out_data, wav_data, out_offset, BinaryLove::GetTupleSize(wav_data[0]) * wav_data.size());
+	BinaryLove::WriteStream(out_data, wav_data, out_offset, BinaryLove::Utility::GetTupleSize(wav_data[0]) * wav_data.size());
 	
 	// Writes the data from "data" to specified file
 	BinaryLove::FileStream::WriteFile("out.wav", out_data);
@@ -86,13 +86,6 @@ int main()
 # Documentation
 
 ## BinaryLove namespace
----
-`template<class ...T> std::size_t GetTupleSize(const std::tuple<T...>& _tuple)`
-
-Purpose: Returns the size of tuple in bytes
-
-`_tuple` - tuple, whose size will be returned
-
 ---
 `template<class ...Types> std::tuple<Types...> Read(const binary_data_t& _buffer, buffer_offset_t& _offset)`
 
@@ -155,6 +148,15 @@ Purpose: Writes vector of bytes to the file with specified name
 `_filename` - name of the file we want to write to
 
 `_data` - data we want to write to the file
+
+---
+## BinaryLove::Utility namespace
+---
+`template<class ...T> std::size_t GetTupleSize(const std::tuple<T...>& _tuple)`
+
+Purpose: Returns the size of tuple in bytes
+
+`_tuple` - tuple, whose size will be returned
 
 ---
 
